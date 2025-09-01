@@ -87,7 +87,7 @@ const RoofLevel = styled.div`
   border: 2px solid rgba(255, 255, 255, 0.3);
   position: relative;
   transition: all 0.3s ease;
-  clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+  clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
   
   &::after {
     content: '';
@@ -97,7 +97,7 @@ const RoofLevel = styled.div`
     right: 0;
     bottom: 0;
     background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-    clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+    clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
   }
 `;
 
@@ -147,11 +147,6 @@ const PRICING = {
     slate: 1.4,
     wood: 1.3,
     other: 1.1
-  },
-  accessibilityMultipliers: {
-    easy: 0.9,
-    moderate: 1.0,
-    difficult: 1.4
   }
 };
 
@@ -161,16 +156,15 @@ const EstimateAndDiagram = ({ roofData }) => {
     let baseEstimate = PRICING.basePrice * roofData.levels;
     
     // Apply multipliers
-    baseEstimate *= PRICING.sizeMultipliers[roofData.sizePerLevel];
+    baseEstimate *= PRICING.sizeMultipliers[roofData.totalSize];
     baseEstimate *= PRICING.steepnessMultipliers[roofData.steepness];
     baseEstimate *= PRICING.mossMultipliers[roofData.mossCoverage];
     baseEstimate *= PRICING.materialMultipliers[roofData.material];
-    baseEstimate *= PRICING.accessibilityMultipliers[roofData.accessibility];
     
     return Math.round(baseEstimate);
   }, [roofData]);
 
-  // Generate roof diagram based on levels and sizes
+  // Generate roof diagram based on levels, total size, steepness, and moss coverage
   const roofLevels = useMemo(() => {
     const levels = [];
     const sizeWidths = {
@@ -179,24 +173,51 @@ const EstimateAndDiagram = ({ roofData }) => {
       large: 220
     };
     
-    // Create levels from bottom to top (largest to smallest)
-    for (let i = roofData.levels - 1; i >= 0; i--) {
-      const baseWidth = sizeWidths[roofData.sizePerLevel];
-      // Each level gets progressively smaller
-      const width = baseWidth * (0.8 + (i * 0.1));
-      const height = 50 + (i * 15); // Each level gets slightly taller
-      const colors = ['#8FBC8F', '#90EE90', '#98FB98']; // Different green shades
+    // Get base width from total size
+    const baseWidth = sizeWidths[roofData.totalSize];
+    
+         // Steepness affects the clip-path (angle of the roof with overhang)
+     const steepnessAngles = {
+       'Flat': 'polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%)',
+       'Low': 'polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%)',
+       'Moderate': 'polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%)',
+       'Steep': 'polygon(0% 0%, 100% 0%, 75% 100%, 25% 100%)',
+       'Very Steep': 'polygon(0% 0%, 100% 0%, 70% 100%, 30% 100%)'
+     };
+    
+    // Moss coverage affects green color intensity
+    const mossIntensity = {
+      'None': 0.3,
+      'Light': 0.5,
+      'Medium': 0.7,
+      'Heavy': 0.9
+    };
+    
+    const intensity = mossIntensity[roofData.mossCoverage];
+    const baseGreen = Math.floor(144 * intensity); // 144 is base green value
+    const colors = [
+      `rgb(${baseGreen}, ${Math.floor(188 * intensity)}, ${Math.floor(143 * intensity)})`, // DarkSeaGreen
+      `rgb(${Math.floor(144 * intensity)}, ${Math.floor(238 * intensity)}, ${Math.floor(144 * intensity)})`, // LightGreen
+      `rgb(${Math.floor(152 * intensity)}, ${Math.floor(251 * intensity)}, ${Math.floor(152 * intensity)})`  // PaleGreen
+    ];
+    
+         // Create levels from bottom to top (largest to smallest)
+     for (let i = 0; i < roofData.levels; i++) {
+       // Each level gets progressively smaller from bottom to top
+       const width = baseWidth * (1.0 - (i * 0.15));
+       const height = 60; // All levels have the same height
       
       levels.push({
         width,
         height,
         color: colors[i % colors.length],
-        level: roofData.levels - i
+        level: i + 1,
+        clipPath: steepnessAngles[roofData.steepness]
       });
     }
     
-    return levels; // Already in correct order (bottom to top)
-  }, [roofData.levels, roofData.sizePerLevel]);
+    return levels;
+  }, [roofData.levels, roofData.totalSize, roofData.steepness, roofData.mossCoverage]);
 
   return (
     <Container>
@@ -210,19 +231,17 @@ const EstimateAndDiagram = ({ roofData }) => {
       
       <BottomSection>
         <div>
-          <DiagramTitle>Your Roof Configuration</DiagramTitle>
+                     <DiagramTitle>Roof Example</DiagramTitle>
           <DiagramContainer>
-            {roofLevels.map((level, index) => (
-              <RoofLevel
-                key={index}
-                color={level.color}
-                style={{
-                  width: `${level.width}px`,
-                  height: `${level.height}px`
-                }}
-              >
-                <LevelLabel>Level {level.level}</LevelLabel>
-              </RoofLevel>
+                         {roofLevels.slice().reverse().map((level, index) => (
+                              <RoofLevel
+                 key={index}
+                 color={level.color}
+                 style={{
+                   width: `${level.width}px`,
+                   height: `${level.height}px`
+                 }}
+               />
             ))}
           </DiagramContainer>
         </div>

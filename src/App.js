@@ -103,11 +103,10 @@ function App() {
   // State for all roof variables
   const [roofData, setRoofData] = useState({
     levels: 1,
-    sizePerLevel: 'medium',
+    totalSize: 'medium',
     steepness: 'moderate',
     mossCoverage: 'light',
-    material: 'shingle',
-    accessibility: 'moderate'
+    material: 'shingle'
   });
 
   // Update roof data when sliders change

@@ -26,16 +26,6 @@ const Tagline = styled.p`
   font-size: 1.2rem;
   color: rgba(255, 255, 255, 0.8);
   font-weight: 300;
-  margin-bottom: 20px;
-`;
-
-const Subtitle = styled.p`
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 400;
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.6;
 `;
 
 const Header = () => {
@@ -43,10 +33,6 @@ const Header = () => {
     <HeaderContainer>
       <Logo>MossCross</Logo>
       <Tagline>Professional Roof Cleaning Services</Tagline>
-      <Subtitle>
-        Get an instant estimate for your roof cleaning project. 
-        Our interactive calculator considers all factors to provide you with an accurate quote.
-      </Subtitle>
     </HeaderContainer>
   );
 };

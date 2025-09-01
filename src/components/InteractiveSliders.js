@@ -131,9 +131,58 @@ const SteepnessIcons = styled.div`
   color: rgba(255, 255, 255, 0.6);
 `;
 
+const MaterialOptions = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+`;
+
+const MaterialOption = styled.div`
+  background: ${props => props.selected ? 'rgba(210, 180, 140, 0.2)' : 'rgba(255, 255, 255, 0.1)'};
+  border: 2px solid ${props => props.selected ? '#D2B48C' : 'rgba(255, 255, 255, 0.2)'};
+  border-radius: 12px;
+  padding: 16px 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  backdrop-filter: blur(10px);
+
+  &:hover {
+    background: rgba(210, 180, 140, 0.15);
+    border-color: #D2B48C;
+    transform: translateY(-2px);
+  }
+`;
+
+const MaterialIcon = styled.div`
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`;
+
+const MaterialName = styled.div`
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-weight: 500;
+  line-height: 1.2;
+`;
+
 const InteractiveSliders = ({ roofData, onDataChange }) => {
   const steepnessLabels = ['Flat', 'Low', 'Moderate', 'Steep', 'Very Steep'];
   const mossLabels = ['None', 'Light', 'Medium', 'Heavy'];
+
+  const materialOptions = [
+    { value: 'shingle', name: 'Asphalt Shingle', icon: '🏠' },
+    { value: 'tile', name: 'Clay/Concrete Tile', icon: '🧱' },
+    { value: 'metal', name: 'Metal', icon: '🔧' },
+    { value: 'slate', name: 'Slate', icon: '🪨' },
+    { value: 'wood', name: 'Wood Shake', icon: '🪵' },
+    { value: 'other', name: 'Other', icon: '🏗️' }
+  ];
 
   return (
     <div>
@@ -164,25 +213,25 @@ const InteractiveSliders = ({ roofData, onDataChange }) => {
           </Select>
         </SliderGroup>
 
-        {/* Roof Size Per Level */}
+        {/* Total Roof Size */}
         <SliderGroup>
           <Label>
-            Size Per Level
-            <InfoIcon data-tooltip="The approximate size category for each roof level">ⓘ</InfoIcon>
+            Total Roof Size
+            <InfoIcon data-tooltip="The approximate total size of your roof">ⓘ</InfoIcon>
           </Label>
           <Slider
             type="range"
             min="0"
             max="2"
-            value={roofData.sizePerLevel === 'small' ? 0 : roofData.sizePerLevel === 'medium' ? 1 : 2}
+            value={roofData.totalSize === 'small' ? 0 : roofData.totalSize === 'medium' ? 1 : 2}
             onChange={(e) => {
               const sizes = ['small', 'medium', 'large'];
-              onDataChange('sizePerLevel', sizes[parseInt(e.target.value)]);
+              onDataChange('totalSize', sizes[parseInt(e.target.value)]);
             }}
           />
           <ValueDisplay>
-            {roofData.sizePerLevel === 'small' ? 'Small (under 1000 sq ft)' : 
-             roofData.sizePerLevel === 'medium' ? 'Medium (1000-2000 sq ft)' : 
+            {roofData.totalSize === 'small' ? 'Small (under 1000 sq ft)' : 
+             roofData.totalSize === 'medium' ? 'Medium (1000-2000 sq ft)' : 
              'Large (over 2000 sq ft)'}
           </ValueDisplay>
         </SliderGroup>
@@ -232,33 +281,18 @@ const InteractiveSliders = ({ roofData, onDataChange }) => {
             Roof Material
             <InfoIcon data-tooltip="The primary material your roof is made of">ⓘ</InfoIcon>
           </Label>
-          <Select
-            value={roofData.material}
-            onChange={(e) => onDataChange('material', e.target.value)}
-          >
-            <option value="shingle">Asphalt Shingle</option>
-            <option value="tile">Clay/Concrete Tile</option>
-            <option value="metal">Metal</option>
-            <option value="slate">Slate</option>
-            <option value="wood">Wood Shake</option>
-            <option value="other">Other</option>
-          </Select>
-        </SliderGroup>
-
-        {/* Accessibility */}
-        <SliderGroup>
-          <Label>
-            Accessibility Level
-            <InfoIcon data-tooltip="How easy it is to access and work on your roof">ⓘ</InfoIcon>
-          </Label>
-          <Select
-            value={roofData.accessibility}
-            onChange={(e) => onDataChange('accessibility', e.target.value)}
-          >
-            <option value="easy">Easy Access</option>
-            <option value="moderate">Moderate Access</option>
-            <option value="difficult">Difficult Access</option>
-          </Select>
+          <MaterialOptions>
+            {materialOptions.map((material) => (
+              <MaterialOption
+                key={material.value}
+                selected={roofData.material === material.value}
+                onClick={() => onDataChange('material', material.value)}
+              >
+                <MaterialIcon>{material.icon}</MaterialIcon>
+                <MaterialName>{material.name}</MaterialName>
+              </MaterialOption>
+            ))}
+          </MaterialOptions>
         </SliderGroup>
       </SlidersContainer>
     </div>
