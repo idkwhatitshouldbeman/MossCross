@@ -101,15 +101,7 @@ const RoofLevel = styled.div`
   }
 `;
 
-const LevelLabel = styled.div`
-  position: absolute;
-  top: -25px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-`;
+
 
 const DiagramTitle = styled.h3`
   font-size: 1.2rem;
