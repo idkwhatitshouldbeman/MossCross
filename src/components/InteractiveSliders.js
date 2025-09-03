@@ -4,14 +4,14 @@ import styled from 'styled-components';
 const SlidersContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  margin-bottom: 20px;
+  gap: 18px;
+  margin-bottom: 15px;
 `;
 
 const SliderGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 10px;
 `;
 
 const Label = styled.label`
@@ -92,7 +92,7 @@ const Select = styled.select`
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   color: white;
   font-size: 1rem;
   font-family: inherit;
@@ -113,11 +113,11 @@ const Select = styled.select`
 `;
 
 const ValueDisplay = styled.div`
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #D2B48C;
   font-weight: 500;
   text-align: center;
-  padding: 8px;
+  padding: 6px;
   background: rgba(210, 180, 140, 0.1);
   border-radius: 6px;
   border: 1px solid rgba(210, 180, 140, 0.2);
@@ -126,23 +126,23 @@ const ValueDisplay = styled.div`
 const SteepnessIcons = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
-  font-size: 0.8rem;
+  margin-top: 6px;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
 `;
 
 const MaterialOptions = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-top: 10px;
+  gap: 10px;
+  margin-top: 8px;
 `;
 
 const MaterialOption = styled.div`
   background: ${props => props.selected ? 'rgba(210, 180, 140, 0.2)' : 'rgba(255, 255, 255, 0.1)'};
   border: 2px solid ${props => props.selected ? '#D2B48C' : 'rgba(255, 255, 255, 0.2)'};
   border-radius: 12px;
-  padding: 16px 12px;
+  padding: 12px 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-align: center;
@@ -156,16 +156,16 @@ const MaterialOption = styled.div`
 `;
 
 const MaterialIcon = styled.div`
-  font-size: 1.5rem;
-  margin-bottom: 8px;
-  height: 30px;
+  font-size: 1.3rem;
+  margin-bottom: 6px;
+  height: 25px;
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
 const MaterialName = styled.div`
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.9);
   font-weight: 500;
   line-height: 1.2;
@@ -187,9 +187,9 @@ const InteractiveSliders = ({ roofData, onDataChange }) => {
   return (
     <div>
       <h2 style={{ 
-        fontSize: '1.8rem', 
+        fontSize: '1.6rem', 
         fontWeight: '600', 
-        marginBottom: '30px',
+        marginBottom: '20px',
         color: 'rgba(255, 255, 255, 0.9)',
         textAlign: 'center'
       }}>

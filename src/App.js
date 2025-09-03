@@ -43,7 +43,7 @@ const GlobalStyle = createGlobalStyle`
 
 const AppContainer = styled.div`
   min-height: 100vh;
-  padding: 20px;
+  padding: 15px 20px 60px 20px;
   position: relative;
   
   /* Subtle background texture */
@@ -68,13 +68,13 @@ const MainContent = styled.main`
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  padding-top: 20px;
-  min-height: calc(100vh - 200px);
+  gap: 30px;
+  padding-top: 15px;
+  margin-bottom: 60px;
   
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 25px;
   }
 `;
 
@@ -83,7 +83,7 @@ const GlassPanel = styled.div`
   backdrop-filter: blur(25px);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
-  padding: 30px;
+  padding: 24px;
   box-shadow: 
     0 12px 40px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
@@ -133,7 +133,7 @@ function App() {
           <EstimateAndDiagram roofData={roofData} />
         </MainContent>
         
-        <GlassPanel style={{ marginTop: '40px', maxWidth: '800px', margin: '40px auto 0' }}>
+        <GlassPanel style={{ marginTop: '30px', maxWidth: '800px', margin: '30px auto 0' }}>
           <ContactSection />
         </GlassPanel>
       </AppContainer>

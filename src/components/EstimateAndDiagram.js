@@ -74,34 +74,38 @@ const DiagramContainer = styled.div`
   position: relative;
   width: 100%;
   max-width: 400px;
-  height: 250px;
+  height: 300px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
 `;
 
 const RoofLevel = styled.div`
-  background: linear-gradient(135deg, ${props => props.color} 0%, ${props => props.color}dd 100%);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: ${props => props.color};
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
   position: relative;
   transition: all 0.3s ease;
-  clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
+  min-height: 40px;
   
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-    clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
+  &:hover {
+    transform: scale(1.02);
+    border-color: rgba(255, 255, 255, 0.8);
   }
 `;
 
-
+const RoofLine = styled.div`
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.3);
+  margin: 0;
+`;
 
 const DiagramTitle = styled.h3`
   font-size: 1.2rem;
@@ -120,11 +124,11 @@ const PRICING = {
     large: 1.4
   },
   steepnessMultipliers: {
-    'Flat': 0.9,
-    'Low': 1.0,
-    'Moderate': 1.1,
-    'Steep': 1.3,
-    'Very Steep': 1.6
+    'Flat': 0.05,     // Minimal differences (flat roof)
+    'Low': 0.15,      // Small differences
+    'Moderate': 0.3,  // Medium differences
+    'Steep': 0.5,     // Large differences
+    'Very Steep': 0.7 // Very large differences
   },
   mossMultipliers: {
     'None': 0.8,
@@ -156,7 +160,7 @@ const EstimateAndDiagram = ({ roofData }) => {
     return Math.round(baseEstimate);
   }, [roofData]);
 
-  // Generate roof diagram based on levels, total size, steepness, and moss coverage
+  // Generate roof diagram based on levels, total size, and moss coverage
   const roofLevels = useMemo(() => {
     const levels = [];
     const sizeWidths = {
@@ -168,44 +172,68 @@ const EstimateAndDiagram = ({ roofData }) => {
     // Get base width from total size
     const baseWidth = sizeWidths[roofData.totalSize];
     
-         // Steepness affects the clip-path (angle of the roof with overhang)
-     const steepnessAngles = {
-       'Flat': 'polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%)',
-       'Low': 'polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%)',
-       'Moderate': 'polygon(0% 0%, 100% 0%, 80% 100%, 20% 100%)',
-       'Steep': 'polygon(0% 0%, 100% 0%, 75% 100%, 25% 100%)',
-       'Very Steep': 'polygon(0% 0%, 100% 0%, 70% 100%, 30% 100%)'
-     };
+    // Steepness affects the size difference between levels - CORRECTED values
+    const steepnessMultipliers = {
+      'Flat': 0.05,     // Minimal differences (flat roof)
+      'Low': 0.15,      // Small differences
+      'Moderate': 0.3,  // Medium differences
+      'Steep': 0.5,     // Large differences
+      'Very Steep': 0.7 // Very large differences
+    };
     
-    // Moss coverage affects green color intensity
+    const steepnessFactor = steepnessMultipliers[roofData.steepness];
+    
+    // Moss coverage affects green color intensity - enhanced for more dramatic visual difference
     const mossIntensity = {
-      'None': 0.3,
-      'Light': 0.5,
-      'Medium': 0.7,
-      'Heavy': 0.9
+      'None': 0.2,      // Very light, almost white-green
+      'Light': 0.4,     // Light green
+      'Medium': 0.7,    // Medium green
+      'Heavy': 1.0      // Full green intensity
     };
     
     const intensity = mossIntensity[roofData.mossCoverage];
-    const baseGreen = Math.floor(144 * intensity); // 144 is base green value
+    
+    // Enhanced color palette with more dramatic moss coverage differences
     const colors = [
-      `rgb(${baseGreen}, ${Math.floor(188 * intensity)}, ${Math.floor(143 * intensity)})`, // DarkSeaGreen
-      `rgb(${Math.floor(144 * intensity)}, ${Math.floor(238 * intensity)}, ${Math.floor(144 * intensity)})`, // LightGreen
-      `rgb(${Math.floor(152 * intensity)}, ${Math.floor(251 * intensity)}, ${Math.floor(152 * intensity)})`  // PaleGreen
+      // Darker green for bottom level
+      `rgb(${Math.floor(34 * intensity)}, ${Math.floor(139 * intensity)}, ${Math.floor(34 * intensity)})`, // ForestGreen
+      // Medium green for middle level  
+      `rgb(${Math.floor(50 * intensity)}, ${Math.floor(205 * intensity)}, ${Math.floor(50 * intensity)})`, // LimeGreen
+      // Lighter green for top level
+      `rgb(${Math.floor(144 * intensity)}, ${Math.floor(238 * intensity)}, ${Math.floor(144 * intensity)})`  // LightGreen
     ];
     
-         // Create levels from bottom to top (largest to smallest)
-     for (let i = 0; i < roofData.levels; i++) {
-       // Each level gets progressively smaller from bottom to top
-       const width = baseWidth * (1.0 - (i * 0.15));
-       const height = 60; // All levels have the same height
+    // Calculate sizes that maintain average width but vary based on steepness
+    const totalLevels = roofData.levels;
+    const averageWidth = baseWidth;
+    
+    // Create levels from bottom to top (largest to smallest)
+    for (let i = 0; i < totalLevels; i++) {
+      // Calculate position from bottom (0 = bottom, totalLevels-1 = top)
+      const positionFromBottom = i;
       
-      levels.push({
+      // Calculate width ensuring average stays the same
+      let width;
+      if (totalLevels === 1) {
+        width = averageWidth;
+      } else {
+        // For multiple levels, distribute sizes around the average
+        // Bottom level (i=0) should be largest, top level (i=totalLevels-1) should be smallest
+        const normalizedPosition = positionFromBottom / (totalLevels - 1);
+        const sizeVariation = (1 - normalizedPosition) * 2; // 2 to 0 (largest to smallest)
+        width = averageWidth * (1 + (sizeVariation - 1) * steepnessFactor);
+      }
+      
+      const height = 50; // Reduced height for more compact display
+      
+      const level = {
         width,
         height,
         color: colors[i % colors.length],
-        level: i + 1,
-        clipPath: steepnessAngles[roofData.steepness]
-      });
+        level: i + 1
+      };
+      
+      levels.push(level);
     }
     
     return levels;
@@ -223,17 +251,19 @@ const EstimateAndDiagram = ({ roofData }) => {
       
       <BottomSection>
         <div>
-                     <DiagramTitle>Roof Example</DiagramTitle>
+          <DiagramTitle>Roof Example</DiagramTitle>
           <DiagramContainer>
-                         {roofLevels.slice().reverse().map((level, index) => (
-                              <RoofLevel
-                 key={index}
-                 color={level.color}
-                 style={{
-                   width: `${level.width}px`,
-                   height: `${level.height}px`
-                 }}
-               />
+            {roofLevels.slice().reverse().map((level, index) => (
+              <React.Fragment key={index}>
+                <RoofLevel
+                  color={level.color}
+                  style={{
+                    width: `${level.width}px`,
+                    height: `${level.height}px`
+                  }}
+                />
+                {index < roofLevels.length - 1 && <RoofLine />}
+              </React.Fragment>
             ))}
           </DiagramContainer>
         </div>
