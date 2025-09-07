@@ -220,8 +220,15 @@ const EstimateAndDiagram = ({ roofData }) => {
         // For multiple levels, distribute sizes around the average
         // Bottom level (i=0) should be largest, top level (i=totalLevels-1) should be smallest
         const normalizedPosition = positionFromBottom / (totalLevels - 1);
-        const sizeVariation = (1 - normalizedPosition) * 2; // 2 to 0 (largest to smallest)
-        width = averageWidth * (1 + (sizeVariation - 1) * steepnessFactor);
+        
+        // Use a more stable width distribution that doesn't depend heavily on steepness
+        // This prevents extreme size variations that can break the diagram
+        const sizeMultiplier = 1.2 - (normalizedPosition * 0.4); // 1.2x to 0.8x range
+        width = averageWidth * sizeMultiplier;
+        
+        // Ensure width is always reasonable
+        width = Math.max(width, averageWidth * 0.4); // Minimum 40% of average width
+        width = Math.min(width, averageWidth * 1.5); // Maximum 150% of average width
       }
       
       const height = 50; // Reduced height for more compact display
